@@ -85,7 +85,7 @@ class MainPage extends React.Component {
                             <th>ТЕКСТ ЗАДАЧІ</th>
                             <th>КАРТИНКИ</th>
                             <th>УПРАВЛІННЯ</th>
-                            <th>ВИКОНАННЯ</th>
+                            <th onClick={() => this.onChangeSort('status')}>ВИКОНАННЯ</th>
                         </tr>
                     </thead>
                     <tbody>

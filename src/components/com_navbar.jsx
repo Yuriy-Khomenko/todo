@@ -21,6 +21,7 @@ class NavBar extends React.Component {
 
                         <Link to='/'>
                             <button className={"btn btn-success m-2"} type="button">
+                                СПИСОК
                             </button>
                         </Link>
 
