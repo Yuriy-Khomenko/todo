@@ -8,6 +8,8 @@ import ContNavBar from './controlers/con_navbar';
 import ContMainPage from './controlers/con_main_page';
 import ContUserLogPage from './controlers/con_user_log_page';
 
+import routs from './routs/routs';
+
 
 
 class App extends Component {
@@ -22,9 +24,9 @@ class App extends Component {
         <ContNavBar />
 
         <Switch>
-          <Route exact path='/todo/' component={ContMainPage} />
-          <Route path='/todo/create' component={ContCreatePage} />
-          <Route path='/todo/userlog' component={ContUserLogPage} />
+          <Route exact path={routs.main} component={ContMainPage} />
+          <Route path={routs.create} component={ContCreatePage} />
+          <Route path={routs.userlog} component={ContUserLogPage} />
         </Switch>
 
       </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
-import { Redirect } from 'react-router'
+import { Redirect } from 'react-router';
+import routs from '../routs/routs';
 
 
 class UserLog extends React.Component {
@@ -33,7 +34,7 @@ class UserLog extends React.Component {
 
     render() {
         if (this.props.log_in) {
-            return <Redirect to={'/todo'} />
+            return <Redirect to={routs.main} />
         }
 
         return (
