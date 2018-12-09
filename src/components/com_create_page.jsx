@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import React from 'react';
+import { Button } from 'reactstrap';
 import resizeImage from 'resize-image';
 
 class CreatePage extends React.Component {
@@ -11,8 +11,11 @@ class CreatePage extends React.Component {
             imagePreviewUrl: '',
             user: '',
             email: '',
-            task: ''
+            task: '',
+            //err_status: this.props.err_status,
+            sin_err_status: this.props.sin_err_status,
         };
+        this.err_status = this.props.err_status;
     }
 
     resize(url, type) {
@@ -46,13 +49,47 @@ class CreatePage extends React.Component {
 
 
     fetchData = () => {
-        let data = new FormData();
-        data.append("username", this.state.user);
-        data.append("email", this.state.email);
-        data.append("text", this.state.task);
-        data.append("image", this.state.file);
-        this.props.onFetch('https://uxcandy.com/~shapoval/test-task-backend/create?developer=Yuriy', data);
+        let data = {
+            username: this.state.user,
+            email: this.state.email,
+            text: this.state.task,
+            image: this.state.file
+        };
+        this.props.onFetch(data);
     }
+
+    errorMsg = () => {
+
+        let msg = "";
+        if (this.props.sin_err_status) {
+            msg = msg + " " + this.props.sin_err_string;
+        } else if (this.props.err_status !== this.err_status) {
+            this.err_status = this.props.err_status;
+            for (let item in this.props.err_string) {
+                msg = msg + item + " - " + this.props.err_string[item] + ", ";
+            }
+            msg = msg.substring(0, msg.length - 2);
+        }
+
+        if (msg.length) {
+            return (
+                <div>
+                    {this.props.sin_err_status !== 2 ?
+                        <div>
+                            <h4 className="text-color-error-header"> помилка </h4>
+                            <h5 className="text-color-error"> {msg} </h5>
+                        </div>
+                        :
+                        <div>
+                            <h4 className="text-color-corect-header"> повідомлення </h4>
+                            <h5 className="text-color-corect"> {msg} </h5>
+                        </div>
+                    }
+                </div >
+            )
+        }
+    }
+
 
     handleImageChange(e) {
         e.preventDefault();
@@ -69,7 +106,7 @@ class CreatePage extends React.Component {
         let { imagePreviewUrl } = this.state;
         let imagePreview = null;
         if (imagePreviewUrl) {
-            imagePreview = (<img src={imagePreviewUrl} />);
+            imagePreview = (<img src={imagePreviewUrl} alt={"img1"} />);
         } else {
             imagePreview = (<div className="previewText"></div>);
         }
@@ -77,6 +114,9 @@ class CreatePage extends React.Component {
         return (
 
             <div className="container">
+                <div className={"row justify-content-center"}>
+                    {<div className={"loader-size"}>{this.errorMsg()} </div>}
+                </div>
 
                 <div className="row m-2 justify-content-center">
                     <label className="col-2 col-form-label">користувач:</label>
@@ -112,7 +152,7 @@ class CreatePage extends React.Component {
 
                 <div className="">
                     {imagePreview}
-                    <img id="display" />
+                    <img id="display" alt={"previe"} />
                 </div>
 
 
@@ -120,7 +160,7 @@ class CreatePage extends React.Component {
                     <Button onClick={this.fetchData}
                         className={"bg-success m-2"} >
                         СТВОРИТИ
-   </Button>
+                    </Button>
 
                 </div >
             </div >

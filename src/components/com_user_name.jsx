@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 
 const textCenter = {
     display: "flex",
@@ -8,10 +8,6 @@ const textCenter = {
 };
 
 class UserName extends React.Component {
-
-    constructor(props) {
-        super(props);
-    }
 
     render() {
         return <span style={textCenter}>

@@ -1,15 +1,40 @@
+import { getTasks } from '../api/api';
+
 export const USER_LOG = 'USER_LOG'
 export const USER_UNLOG = 'USER_UNLOG'
 export const GET_TASKS = 'GET_TASKS'
 export const NEXT_PAGE = 'NEXT_PAGE'
 export const PREV_PAGE = 'PREV_PAGE'
-export const CHANGE_SORT_DIRECT = 'CHANGE_SORT_DIRECT'
-export const CHANGE_SORT_FIELD = 'CHANGE_SORT_FIELD'
 export const UPDATE = 'UPDATE'
-export const HAS_ERRORED = 'HAS_ERRORED';
+export const SERVER_MSG = 'SERVER_MSG';
 export const IS_LOADING = 'IS_LOADING';
 export const FETCH_DATA_SUCCESS = 'FETCH_DATA_SUCCESS';
+export const FIELD_UNCORECT = 'FIELD_UNCORECT'
+export const CHANGE_PAGE = 'CHANGE_PAGE'
+export const CHANGE_SORT_DIRECTION = 'CHANGE_SORT_DIRECTION'
+export const CHANGE_SORT_FIELD = 'CHANGE_SORT_FIELD'
 
+
+export const emit_ChangePage = (page) => {
+    return {
+        type: CHANGE_PAGE,
+        page: page
+    }
+}
+
+export const emit_ChangeSortDir = (sd) => {
+    return {
+        type: CHANGE_SORT_DIRECTION,
+        sort_direction: sd
+    }
+}
+
+export const emit_ChangeSortField = (field) => {
+    return {
+        type: CHANGE_SORT_FIELD,
+        field: field
+    }
+}
 
 
 export const emit_NextPage = () => {
@@ -22,23 +47,6 @@ export const emit_PrevPage = () => {
         type: PREV_PAGE
     }
 }
-export const emit_ChangeSortDir = (val) => {
-    return {
-        type: CHANGE_SORT_DIRECT,
-        data: {
-            sort_direction: val
-        }
-    }
-}
-export const emit_ChangeSortField = (val) => {
-    return {
-        type: CHANGE_SORT_FIELD,
-        data: {
-            sort_field: val
-        }
-    }
-}
-
 
 export const emit_UserLog = (name, pass) => {
     return {
@@ -54,21 +62,18 @@ export const emit_UserUnLog = () => {
     }
 }
 
-export const emit_Update = (val) => {
+export function hasErrored(msg, e) {
     return {
-        type: UPDATE,
-        up: val
-    }
+        type: SERVER_MSG,
+        serverStatus: msg,
+        serverMsg: e
+    };
 }
 
-
-export function hasErrored(bool, e) {
-
-    console.log(e);
-    alert('err')
+export function emit_serverMsg(err_string) {
     return {
-        type: HAS_ERRORED,
-        hasErrored: bool
+        type: FIELD_UNCORECT,
+        errString: err_string
     };
 }
 
@@ -80,70 +85,74 @@ export function isLoading(bool) {
 }
 
 export function get_tasks(data) {
-
-    console.log(data);
     return {
         type: GET_TASKS,
         data: {
             tasks: data.message.tasks,
-            total_task_count: parseInt(data.message.total_task_count)
+            total_task_count: parseInt(data.message.total_task_count, 10)
         }
     }
 };
+
+export const emit_Update = (val) => {
+    return {
+        type: UPDATE,
+        up: val
+    }
+}
 //********************************* */
 
 
 export function fetchDataSuccess(dispatch, data) {
-
-    console.log(data)
-    //dispatch(set_user_name(data));
     dispatch(get_tasks(data));
-    dispatch(emit_Update(false));
 }
 
-export function fetchCreateSuccess(dispatch, data) {
+export function fetchCreateSuccess(dispatch, data, getState) {
 
-    //  console.log(data)
-    //alert(56456)
-    dispatch(emit_Update(true));
-    //dispatch(emit_setCurentTask(data.name));
+    let state = getState().hasErrored;
+    state.serverStatus = 0;
+    state.serverMsg = "";
+
+    if (data.status === "error") {
+        dispatch(emit_serverMsg(data.message));
+    } else if (data.status === "ok") {
+
+        dispatch(hasErrored(2, "створення задачі пройшло успішно"));
+
+        //} else {
+        let { reducMain: stor } = getState();
+        let field_set = {
+            page: stor.page,
+            sort_direction: stor.sort_direction,
+            sort_field: stor.sort_field
+        }
+        dispatch(getTasks(field_set));
+    }
 }
 
-export function emit_fetchData(url, body, method) {
-    console.log(url);
+export function emit_fetchData(url, params = {}) {
 
-    return (dispatch, state) => {
+    return (dispatch, getState) => {
         dispatch(isLoading(true));
 
-        if (body) {
-            let hnd;
-            if (method == 'POST') {
+        let hnd;
+        let method = params ? params.method : 'GET';
+        switch (method) {
+            case 'POST':
                 hnd = fetchCreateSuccess;
-            }
+                break;
+            default:
+                hnd = fetchDataSuccess;
+        };
 
-
-            let emit_hendler = (handler_func) => {
-                fetch(url, {
-                    method: method,
-                    body: body
-                })
-                    .then((response) => {
-                        if (!response.ok) {
-                            throw Error(response.statusText);
-                        }
-                        dispatch(isLoading(false));
-                        return response;
-                    })
-                    .then((response) => response.json())
-                    .then((data) => handler_func(dispatch, data))
-                    .catch((e) => dispatch(hasErrored(true, e))
-                    );
-            }
-            emit_hendler(hnd);
-
-        } else {
-
-            fetch(url)
+        let emit_hendler = (handler_func) => {
+            fetch(url, {
+                method: 'GET',
+                /*headers: {
+                    'Content-Type': 'application/json'
+                },*/
+                ...params
+            })
                 .then((response) => {
                     if (!response.ok) {
                         throw Error(response.statusText);
@@ -152,9 +161,10 @@ export function emit_fetchData(url, body, method) {
                     return response;
                 })
                 .then((response) => response.json())
-                .then((data) => fetchDataSuccess(dispatch, data))
-                .catch((e) => dispatch(hasErrored(true, e))
+                .then((data) => handler_func(dispatch, data, getState))
+                .catch((e) => dispatch(hasErrored(1, e))
                 );
         }
+        emit_hendler(hnd);
     };
 }

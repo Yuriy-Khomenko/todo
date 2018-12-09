@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter, FormGroup, Label, Input } from 'reactstrap';
-import md5 from 'md5';
+
 
 
 class ModalWin extends React.Component {
@@ -24,18 +24,11 @@ class ModalWin extends React.Component {
     }
 
     save = () => {
-        let str_URI = "status=" + this.state.status + "&text=" + encodeURIComponent(this.state.task) + "&token=beejee";
-        let str_md5 = md5(str_URI);
-
-        let data = new FormData();
-        data.append("status", this.state.status);
-        data.append("text", encodeURIComponent(this.state.task));
-        data.append("token", "beejee");
-        data.append("signature", str_md5);
-
-        str_URI = 'https://uxcandy.com/~shapoval/test-task-backend/edit/' + this.props.id + 'id?developer=Yuriy';
-
-        this.props.onFetch(str_URI, data, 'POST');
+        this.props.onFetch({
+            status: this.state.status,
+            task: this.state.task,
+            id: this.props.id
+        }, true);
 
         this.toggle();
     };
@@ -47,7 +40,11 @@ class ModalWin extends React.Component {
         return (
             <div>
                 <Button disabled={!this.props.admin} color="primary" className={"m-2"} onClick={this.toggle}>{this.props.buttonLabel}</Button>
-                <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
+                <Modal
+                    isOpen={this.state.modal}
+                    toggle={this.toggle}
+                    className={this.props.className}
+                >
                     <ModalHeader toggle={this.toggle}>ЗМІНА ЗАДАЧІ</ModalHeader>
                     <ModalBody>
                         <FormGroup>
@@ -56,7 +53,7 @@ class ModalWin extends React.Component {
                         </FormGroup>
                         <FormGroup check inline>
                             <Label check>
-                                <Input  checked={this.state.status == 10}  onChange={this.onCheck} type="checkbox" /> завдання виконано
+                                <Input checked={this.state.status === 10} onChange={this.onCheck} type="checkbox" /> завдання виконано
                         </Label>
                         </FormGroup>
                     </ModalBody>

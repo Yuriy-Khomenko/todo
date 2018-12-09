@@ -6,7 +6,8 @@ import { emit_UserUnLog } from '../actions/actions'
 const mapStateToProps = (state, ownProps) => {
     return {
         user_name: state.reducUserLog.userName,
-        is_admin: state.reducUserLog.admin
+        is_admin: state.reducUserLog.admin,
+        is_loading: state.isLoading
     }
 }
 

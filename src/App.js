@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 
 import { Route, Switch } from "react-router-dom";
@@ -23,9 +22,9 @@ class App extends Component {
         <ContNavBar />
 
         <Switch>
-          <Route exact path='/' component={ContMainPage} />
-          <Route path='/create' component={ContCreatePage} />
-          <Route path='/userlog' component={ContUserLogPage} />
+          <Route exact path='/todo/' component={ContMainPage} />
+          <Route path='/todo/create' component={ContCreatePage} />
+          <Route path='/todo/userlog' component={ContUserLogPage} />
         </Switch>
 
       </div>

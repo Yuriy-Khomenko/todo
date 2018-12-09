@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import TaskItem from './com_task_item.jsx';
 
 var Style = {
@@ -11,71 +11,128 @@ class MainPage extends React.Component {
         super(props);
 
         this.state = {
-            curent_page: this.props.curent_page,
-            sort_direction: this.props.sort_direction,
-            sort_field: this.props.sort_field,
-            update: this.props.update
+            curent_page: this.props.page
         };
     }
 
     componentDidUpdate(prevProps, prevState) {
-        if (prevProps.update !== this.props.update) {
-            if (this.props.update == true) {
-                this.getTasks();
-            }
+        if (this.props.page !== prevProps.page) {
+            this.setState({ curent_page: this.props.page });
         }
     }
+
     componentDidMount() {
         this.getTasks();
     }
 
-    onChangeCountPage = (e) => { this.setState({ curent_page: e.target.value }) }
+    onChangeCountPage = (e) => {
+        this.setState({ curent_page: e.target.value })
+    }
 
-    getTasks = (page, cal) => {
-        this.props.onFetch('https://uxcandy.com/~shapoval/test-task-backend/?developer=Yuriy&page=' + this.state.curent_page
-            + '&sort_direction=' + this.state.sort_direction
-            + '&sort_field=' + this.state.sort_field
+    onFocusOutCountPage = (e) => {
+
+        this.props.changePage(
+            {
+                page: e.target.value,
+                sort_direction: this.props.sort_direction,
+                sort_field: this.props.sort_field
+            }
+        );
+    }
+
+    getTasks = () => {
+        this.props.onFetch({
+            page: this.props.page,
+            sort_direction: this.props.sort_direction,
+            sort_field: this.props.sort_field
+        }
         );
     }
 
     onInPage = () => {
-        this.setState({ curent_page: this.state.curent_page + 1 }, this.getTasks);
+        this.props.changePage(
+            {
+                page: Number(this.props.page) + 1,
+                sort_direction: this.props.sort_direction,
+                sort_field: this.props.sort_field
+            }
+        );
     }
 
     onDecPage = () => {
-        if (this.state.curent_page == 1) {
+        if (this.props.page === 1) {
             return;
         }
-        this.setState({ curent_page: this.state.curent_page - 1 }, this.getTasks);
+        this.props.changePage(
+            {
+                page: Number(this.props.page) - 1,
+                sort_direction: this.props.sort_direction,
+                sort_field: this.props.sort_field
+            }
+        );
     }
 
+    onForvard = () => {
+        this.props.changePage(
+            {
+                page: Math.ceil(this.props.total_task_count / 3),
+                sort_direction: this.props.sort_direction,
+                sort_field: this.props.sort_field
+            }
+        );
+    }
+
+    onBack = () => {
+        if (this.props.page === 1) {
+            return;
+        }
+        this.props.changePage(
+            {
+                page: 1,
+                sort_direction: this.props.sort_direction,
+                sort_field: this.props.sort_field
+            }
+        );
+    }
 
     onChangeSort = (val) => {
-        if (this.state.sort_field === val) {
-            this.state.sort_direction === 'asc' ?
-                this.setState({ sort_direction: 'desc' }, this.getTasks)
+
+        let field_setting = {
+            page: this.props.page,
+            sort_direction: this.props.sort_direction,
+            sort_field: this.props.sort_field
+        };
+
+        if (this.props.sort_field === val) {
+            this.props.sort_direction === 'asc' ?
+                (field_setting.sort_direction = 'desc')
                 :
-                this.setState({ sort_direction: 'asc' }, this.getTasks)
+                (field_setting.sort_direction = 'asc')
         } else {
-            this.setState({ sort_field: val }, this.getTasks)
+            field_setting.sort_field = val;
         }
+        this.props.changePage(field_setting);
     }
 
     render() {
 
-        let arr = [];
+        let tasks = [];
         let item;
 
         if (this.props.tasks) {
             for (let i = 0; i < this.props.tasks.length; i++) {
                 item = this.props.tasks[i];
-                arr.push(<TaskItem key={item.id} task={item} onFetch={this.props.onFetch} admin={this.props.admin} />);
+                tasks.push(<TaskItem
+                    key={item.id}
+                    task={item}
+                    onFetch={this.props.onFetch}
+                    admin={this.props.admin}
+                />);
             }
         }
 
         return <div className={"container "}>
-            <div className={"row justify-content-start"}>
-
+            <div className={"row justify-content-center"}>
                 <table className="table table-striped table-bordered">
                     <thead>
                         <tr className="table-warning">
@@ -85,24 +142,37 @@ class MainPage extends React.Component {
                             <th>ТЕКСТ ЗАДАЧІ</th>
                             <th>КАРТИНКИ</th>
                             <th>УПРАВЛІННЯ</th>
-                            <th onClick={() => this.onChangeSort('status')}>ВИКОНАННЯ</th>
+                            <th onClick={() => this.onChangeSort('status')}>ВИКОНАНО</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {arr}
+                        {tasks}
                     </tbody>
                 </table>
             </div>
 
             <div className={"row justify-content-end"}>
 
+                <button onClick={this.onBack} className={"btn btn-success m-2"} type="button">
+                    &#8656;
+        </button>
                 <button onClick={this.onDecPage} className={"btn btn-success m-2"} type="button">
                     &#8592;
                 </button>
-                <input type="text" style={Style} className="form-control m-2" value={this.state.curent_page} min="1" max="100" />
+                <input type="text"
+                    style={Style}
+                    className="form-control m-2"
+                    value={this.state.curent_page}
+                    onBlur={this.onFocusOutCountPage}
+                    onChange={this.onChangeCountPage}
+                />
+
                 <button onClick={this.onInPage} className={"btn btn-success m-2"} type="button">
                     &#8594;
                 </button>
+                <button onClick={this.onForvard} className={"btn btn-success m-2"} type="button">
+                    &#8658;
+            </button>
             </div>
         </div>;
     }

@@ -1,13 +1,8 @@
-import React, { Component } from 'react';
-import { Button } from 'reactstrap';
+import React from 'react';
 import ModalWin from './modal.jsx';
 
 
 class TaskItem extends React.Component {
-
-    constructor(props) {
-        super(props);
-    }
 
     render() {
         return <tr>
@@ -20,12 +15,18 @@ class TaskItem extends React.Component {
             </td>
             <td>
                 <div className={"d-flex justify-content-center"}>
-                    <ModalWin buttonLabel={"редагування"} task={this.props.task.text} id={this.props.task.id} status={this.props.task.status} onFetch={this.props.onFetch} admin={this.props.admin} />
+                    <ModalWin buttonLabel={"редагування"}
+                        task={this.props.task.text}
+                        id={this.props.task.id}
+                        status={this.props.task.status}
+                        onFetch={this.props.onFetch}
+                        admin={this.props.admin}
+                    />
                 </div>
             </td>
             <td>
                 <div className="custom-control custom-checkbox">
-                    <input disabled="1" type="checkbox" checked={this.props.task.status == 10} className="custom-control-input" id={"customCheck_" + this.props.task.id} /><label className="custom-control-label" htmlFor={"customCheck_" + this.props.task.id}></label>
+                    <input disabled="1" type="checkbox" checked={this.props.task.status === 10} className="custom-control-input" id={"customCheck_" + this.props.task.id} /><label className="custom-control-label" htmlFor={"customCheck_" + this.props.task.id}></label>
                 </div>
             </td>
         </tr>;

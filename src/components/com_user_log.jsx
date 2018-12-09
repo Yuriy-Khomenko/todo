@@ -1,5 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap';
+import { Redirect } from 'react-router'
+
 
 class UserLog extends React.Component {
     constructor(props) {
@@ -19,7 +21,20 @@ class UserLog extends React.Component {
         });
     }
 
+    userLogin = () => {
+        let name = document.getElementById("name").value;
+        let pass = document.getElementById("pass").value;
+        if (name && pass) {
+            this.props.onUserLog(this.state.name, this.state.pass);
+        } else {
+            this.toggle();
+        }
+    }
+
     render() {
+        if (this.props.log_in) {
+            return <Redirect to={'/todo'} />
+        }
 
         return (
             <div className="container">
@@ -36,23 +51,12 @@ class UserLog extends React.Component {
                         <input className="form-control" type="password" id="pass" value={this.state.pass} onChange={this.onChangePass} />
                     </div>
                 </div>
+                <div> (login: admin, pass: 123) </div>
 
                 <br />
 
                 <div className="row col-12 justify-content-center">
-                    <Button onClick={
-                        () => {
-
-                            let name = document.getElementById("name").value;
-                            let pass = document.getElementById("pass").value;
-                            if (name && pass) {
-
-                                this.props.onUserLog(this.state.name, this.state.pass);
-                            } else {
-                                this.toggle();
-                            }
-                        }
-                    }
+                    <Button onClick={() => { this.userLogin() }}
                         className={"bg-success m-2"} >
                         ВВІЙТИ
                 </Button>

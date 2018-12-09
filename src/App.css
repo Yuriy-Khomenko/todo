@@ -1,3 +1,13 @@
+.App {
+  text-align: center;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 .bouton-image:before {
   content: "";
   width: 30px;
@@ -7,18 +17,38 @@
   background-color: transparent;
   background-position : center center;
   background-repeat:no-repeat;
-  background-image : url(img/trash_empty.png);
+  /*background-image : url(img/trash_empty.png);*/
    background-size: contain;
 }
 
-
-.App {
-  text-align: center;
+.navbar{
+  margin-bottom: 20px;
 }
 
-.App-logo {
-  animation: App-logo-spin infinite 20s linear;
-  height: 80px;
+.loader {
+   background-image: url(img/dl.gif);
+  background-repeat:no-repeat;
+  background-size: contain;
+}
+.loader-size {
+  min-height: 80px;
+  min-width: 80px;
+}
+
+.text-color-error-header{
+  color: rgb(255, 0, 0);
+  font-weight: 600;
+}
+.text-color-error{
+  color: rgb(180, 2, 11);
+}
+
+.text-color-corect-header{
+  color: rgb(4, 219, 4);
+  font-weight: 600;
+}
+.text-color-corect{
+  color: rgb(54, 149, 78);
 }
 
 .App-header {
@@ -34,9 +64,4 @@
 
 .App-intro {
   font-size: large;
-}
-
-@keyframes App-logo-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
 }

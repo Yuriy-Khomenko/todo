@@ -1,11 +1,19 @@
 
-import { HAS_ERRORED, IS_LOADING } from '../actions/actions'
+import { SERVER_MSG, IS_LOADING } from '../actions/actions'
+
+let init = {
+    status: 0,
+    serverMsg: ""
+}
 
 
-export function hasErrored(state = false, action) {
+export function hasErrored(state = init, action) {
     switch (action.type) {
-        case HAS_ERRORED:
-            return action.hasErrored;
+        case SERVER_MSG:
+            return {
+                serverStatus: action.serverStatus,
+                serverMsg: action.serverMsg
+            };
 
         default:
             return state;
